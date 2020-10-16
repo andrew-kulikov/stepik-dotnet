@@ -1,10 +1,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Inheritance.Geometry.Visitor
 {
-    public abstract class Body: IVisitable
+    public abstract class Body : IVisitable
     {
         public Vector3 Position { get; }
 
@@ -13,10 +15,7 @@ namespace Inheritance.Geometry.Visitor
             Position = position;
         }
 
-        public TResult Accept<TResult>(IVisitor visitor)
-        {
-            return visitor.Visit<TResult>(this);
-        }
+        public abstract TResult Accept<TResult>(IVisitor visitor);
     }
 
     public class Ball : Body
@@ -26,6 +25,11 @@ namespace Inheritance.Geometry.Visitor
         public Ball(Vector3 position, double radius) : base(position)
         {
             Radius = radius;
+        }
+
+        public override TResult Accept<TResult>(IVisitor visitor)
+        {
+            return visitor.VisitBall<TResult>(this);
         }
     }
 
@@ -41,6 +45,11 @@ namespace Inheritance.Geometry.Visitor
             SizeY = sizeY;
             SizeZ = sizeZ;
         }
+
+        public override TResult Accept<TResult>(IVisitor visitor)
+        {
+            return visitor.VisitRectangle<TResult>(this);
+        }
     }
 
     public class Cylinder : Body
@@ -54,6 +63,11 @@ namespace Inheritance.Geometry.Visitor
             SizeZ = sizeZ;
             Radius = radius;
         }
+
+        public override TResult Accept<TResult>(IVisitor visitor)
+        {
+            return visitor.VisitCylinder<TResult>(this);
+        }
     }
 
     public class CompoundBody : Body
@@ -64,17 +78,19 @@ namespace Inheritance.Geometry.Visitor
         {
             Parts = parts;
         }
-    }
 
-
-    public interface IVisitor<TVisited, TResult> : IVisitor where TVisited : IVisitable
-    {
-        TResult Visit(TVisited visited);
+        public override TResult Accept<TResult>(IVisitor visitor)
+        {
+            return visitor.VisitCompound<TResult>(this);
+        }
     }
 
     public interface IVisitor
     {
-        TResult Visit<TResult>(IVisitable visited);
+        TResult VisitBall<TResult>(Ball visited);
+        TResult VisitCylinder<TResult>(Cylinder visited);
+        TResult VisitRectangle<TResult>(RectangularCuboid visited);
+        TResult VisitCompound<TResult>(CompoundBody visited);
     }
 
     public interface IVisitable
@@ -82,45 +98,112 @@ namespace Inheritance.Geometry.Visitor
         TResult Accept<TResult>(IVisitor visitor);
     }
 
-    public abstract class Visitor : IVisitor
+    public class BoundingBoxVisitor : IVisitor
     {
-        private Dictionary<string, object> _typedVisitors = new Dictionary<string, object>();
-
-        protected void AddTypedVisitor<TVisited, TResult>(IVisitor<TVisited, TResult> visitor) where TVisited : IVisitable
+        public TResult VisitBall<TResult>(Ball visited)
         {
-            var key = $"{typeof(TVisited).FullName}_{typeof(TResult).FullName}";
+            if (typeof(TResult) != typeof(RectangularCuboid)) throw new ArgumentException();
 
-            _typedVisitors[key] = visitor;
+            var d = visited.Radius * 2;
+            var bound = new RectangularCuboid(visited.Position, d, d, d);
+
+            return (TResult)(object)bound;
         }
 
-        public TResult Visit<TResult>(IVisitable visited)
+        public TResult VisitCylinder<TResult>(Cylinder visited)
         {
-            var key = $"{visited.GetType().FullName}_{typeof(TResult).FullName}";
+            if (typeof(TResult) != typeof(RectangularCuboid)) throw new ArgumentException();
 
-            if (!_typedVisitors.TryGetValue(key, out var visitorObj)) return default;
+            var d = 2 * visited.Radius;
 
-            throw new NotImplementedException();
-            
+            var bound = new RectangularCuboid(visited.Position, d, d, visited.SizeZ);
+
+            return (TResult)(object)bound;
         }
 
-        protected abstract TResult Visit<TVisited, TResult>(IVisitor<TVisited, TResult> visitor)
-            where TVisited : IVisitable;
+        public TResult VisitRectangle<TResult>(RectangularCuboid visited)
+        {
+            if (typeof(TResult) != typeof(RectangularCuboid)) throw new ArgumentException();
+
+            var bound = new RectangularCuboid(visited.Position, visited.SizeX, visited.SizeY, visited.SizeZ);
+
+            return (TResult)(object)bound;
+        }
+
+        public TResult VisitCompound<TResult>(CompoundBody visited)
+        {
+            if (typeof(TResult) != typeof(RectangularCuboid)) throw new ArgumentException();
+
+            var x = FindBoundingBoxLine(visited, pos => pos.X);
+            var y = FindBoundingBoxLine(visited, pos => pos.Y);
+            var z = FindBoundingBoxLine(visited, pos => pos.Z);
+
+            var bound = new RectangularCuboid(new Vector3(x.Center, y.Center, z.Center), x.Length, y.Length, z.Length);
+
+            return (TResult)(object)bound;
+        }
+
+        private Line FindBoundingBoxLine(CompoundBody body, Func<Vector3, double> coordinateSelector)
+        {
+            var min = body.Parts.Min(p => coordinateSelector(GetMinPoint(p.TryAcceptVisitor<RectangularCuboid>(this))));
+            var max = body.Parts.Max(p => coordinateSelector(GetMaxPoint(p.TryAcceptVisitor<RectangularCuboid>(this))));
+
+            return new Line(min, max);
+        }
+
+        public Vector3 GetMinPoint(RectangularCuboid r) => new Vector3(
+            r.Position.X - r.SizeX / 2,
+            r.Position.Y - r.SizeY / 2,
+            r.Position.Z - r.SizeZ / 2);
+        public Vector3 GetMaxPoint(RectangularCuboid r) => new Vector3(
+            r.Position.X + r.SizeX / 2,
+            r.Position.Y + r.SizeY / 2,
+            r.Position.Z + r.SizeZ / 2);
+
+        private class Line
+        {
+            public Line(double start, double end)
+            {
+                Start = start;
+                End = end;
+            }
+
+            private double Start { get; }
+            private double End { get; }
+            public double Center => (End + Start) / 2;
+            public double Length => Math.Abs(End - Start);
+        }
     }
 
-    public class BoundingBoxVisitor: IVisitor
+    public class BoxifyVisitor : IVisitor
     {
-        
-        public TResult Visit<TResult>(IVisitable visited)
+        public TResult VisitBall<TResult>(Ball visited)
         {
-            throw new System.NotImplementedException();
+            return new BoundingBoxVisitor().VisitBall<TResult>(visited);
         }
-    }
 
-    public class BoxifyVisitor: IVisitor
-    {
-        public TResult Visit<TResult>(IVisitable visited)
+        public TResult VisitCylinder<TResult>(Cylinder visited)
         {
-            throw new System.NotImplementedException();
+            return new BoundingBoxVisitor().VisitCylinder<TResult>(visited);
+        }
+
+        public TResult VisitRectangle<TResult>(RectangularCuboid visited)
+        {
+            return new BoundingBoxVisitor().VisitRectangle<TResult>(visited);
+        }
+
+        public TResult VisitCompound<TResult>(CompoundBody visited)
+        {
+            if (typeof(TResult) == typeof(RectangularCuboid)) return new BoundingBoxVisitor().VisitCompound<TResult>(visited);
+
+            var parts = visited.Parts.Select(p =>
+            {
+                if (p is CompoundBody cb) return (Body)(CompoundBody)(object)VisitCompound<TResult>(cb);
+                return (RectangularCuboid) (object) p.Accept<RectangularCuboid>(this);
+            })
+                .ToList();
+
+            return (TResult) (object) new CompoundBody(parts);
         }
     }
 }

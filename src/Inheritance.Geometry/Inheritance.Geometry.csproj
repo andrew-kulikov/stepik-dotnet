@@ -55,6 +55,7 @@
     <Compile Include="Visitor\BodyExtensions.cs" />
     <Compile Include="Visitor\BoundingBoxVisitor_Should.cs" />
     <Compile Include="Visitor\BoxifyVisitor_Should.cs" />
+    <Compile Include="Visitor\GenericReturnVisitor.cs" />
     <Compile Include="Visitor\VisitorTask.cs" />
     <Compile Include="Virtual\VirtualTask.cs" />
     <Compile Include="Virtual\VirtualTask_Should.cs" />
