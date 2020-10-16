@@ -1,15 +1,21 @@
 
+using System;
 using System.Collections.Generic;
 
 namespace Inheritance.Geometry.Visitor
 {
-    public abstract class Body
+    public abstract class Body: IVisitable
     {
         public Vector3 Position { get; }
 
         protected Body(Vector3 position)
         {
             Position = position;
+        }
+
+        public TResult Accept<TResult>(IVisitor visitor)
+        {
+            return visitor.Visit<TResult>(this);
         }
     }
 
@@ -60,13 +66,61 @@ namespace Inheritance.Geometry.Visitor
         }
     }
 
-    public class BoundingBoxVisitor
+
+    public interface IVisitor<TVisited, TResult> : IVisitor where TVisited : IVisitable
     {
-        //TODO
+        TResult Visit(TVisited visited);
     }
 
-    public class BoxifyVisitor
+    public interface IVisitor
     {
-        //TODO
+        TResult Visit<TResult>(IVisitable visited);
+    }
+
+    public interface IVisitable
+    {
+        TResult Accept<TResult>(IVisitor visitor);
+    }
+
+    public abstract class Visitor : IVisitor
+    {
+        private Dictionary<string, object> _typedVisitors = new Dictionary<string, object>();
+
+        protected void AddTypedVisitor<TVisited, TResult>(IVisitor<TVisited, TResult> visitor) where TVisited : IVisitable
+        {
+            var key = $"{typeof(TVisited).FullName}_{typeof(TResult).FullName}";
+
+            _typedVisitors[key] = visitor;
+        }
+
+        public TResult Visit<TResult>(IVisitable visited)
+        {
+            var key = $"{visited.GetType().FullName}_{typeof(TResult).FullName}";
+
+            if (!_typedVisitors.TryGetValue(key, out var visitorObj)) return default;
+
+            throw new NotImplementedException();
+            
+        }
+
+        protected abstract TResult Visit<TVisited, TResult>(IVisitor<TVisited, TResult> visitor)
+            where TVisited : IVisitable;
+    }
+
+    public class BoundingBoxVisitor: IVisitor
+    {
+        
+        public TResult Visit<TResult>(IVisitable visited)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    public class BoxifyVisitor: IVisitor
+    {
+        public TResult Visit<TResult>(IVisitable visited)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
