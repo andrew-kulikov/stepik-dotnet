@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generics.Robots", "Generics
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delegates.Reports", "Delegates.Reports\Delegates.Reports.csproj", "{EFC39780-2E5B-4C21-8605-8C21B4DFA19F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delegates.Observers", "Delegates.Observers\Delegates.Observers.csproj", "{701502B0-D50D-424F-8DF1-E20E2B493874}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{EFC39780-2E5B-4C21-8605-8C21B4DFA19F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFC39780-2E5B-4C21-8605-8C21B4DFA19F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFC39780-2E5B-4C21-8605-8C21B4DFA19F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{701502B0-D50D-424F-8DF1-E20E2B493874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{701502B0-D50D-424F-8DF1-E20E2B493874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{701502B0-D50D-424F-8DF1-E20E2B493874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{701502B0-D50D-424F-8DF1-E20E2B493874}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
