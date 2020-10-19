@@ -7,65 +7,74 @@ using System.Threading.Tasks;
 
 namespace Generics.Robots
 {
-    public abstract class RobotAI
+    public interface IRobotAI<out TCommand> where TCommand : IMoveCommand
     {
-        public abstract object GetCommand();
+        TCommand GetCommand();
     }
 
-    public class ShooterAI : RobotAI
+    public abstract class RobotAI<TCommand>: IRobotAI<TCommand> where TCommand : IMoveCommand
+    {
+        public abstract TCommand GetCommand();
+    }
+
+    public class ShooterAI : RobotAI<IShooterMoveCommand>
     {
         int counter = 1;
 
-        public override object GetCommand()
+        public override IShooterMoveCommand GetCommand()
         {
             return ShooterCommand.ForCounter(counter++);
         }
     }
 
-    public class BuilderAI : RobotAI
+    public class BuilderAI : RobotAI<IMoveCommand>
     {
         int counter = 1;
 
-        public override object GetCommand()
+        public override IMoveCommand GetCommand()
         {
             return BuilderCommand.ForCounter(counter++);
         }
     }
 
-    public abstract class Device
+    public interface IDevice<in TCommand> where TCommand : IMoveCommand
     {
-        public abstract string ExecuteCommand(object command);
+        string ExecuteCommand(TCommand command);
     }
 
-    public class Mover : Device
+    public abstract class Device<TCommand>: IDevice<TCommand> where TCommand : IMoveCommand
     {
-        public override string ExecuteCommand(object _command)
+        public abstract string ExecuteCommand(TCommand command);
+    }
+
+    public class Mover : Device<IMoveCommand>
+    {
+        public override string ExecuteCommand(IMoveCommand command)
         {
-            var command = _command as IMoveCommand;
-            if (command == null)
-                throw new ArgumentException();
+            if (command == null) throw new ArgumentException();
+
             return $"MOV {command.Destination.X}, {command.Destination.Y}";
         }
     }
 
-    public class ShooterMover : Device
+    public class ShooterMover : Device<IShooterMoveCommand>
     {
-        public override string ExecuteCommand(object _command)
+        public override string ExecuteCommand(IShooterMoveCommand command)
         {
-            var command = _command as IShooterMoveCommand;
-            if (command == null)
-                throw new ArgumentException();
+            if (command == null) throw new ArgumentException();
+
             var hide = command.ShouldHide ? "YES" : "NO";
+
             return $"MOV {command.Destination.X}, {command.Destination.Y}, USE COVER {hide}";
         }
     }
 
-    public class Robot
+    public class Robot<TCommand> where TCommand : IMoveCommand
     {
-        private readonly RobotAI ai;
-        private readonly Device device;
+        private readonly IRobotAI<TCommand> ai;
+        private readonly IDevice<TCommand> device;
 
-        public Robot(RobotAI ai, Device executor)
+        public Robot(IRobotAI<TCommand> ai, IDevice<TCommand> executor)
         {
             this.ai = ai;
             this.device = executor;
@@ -81,10 +90,13 @@ namespace Generics.Robots
                 yield return device.ExecuteCommand(command);
             }
         }
+    }
 
-        public static Robot Create<TCommand>(RobotAI ai, Device executor)
+    public class Robot
+    {
+        public static Robot<TCommand> Create<TCommand>(IRobotAI<TCommand> ai, IDevice<TCommand> executor) where TCommand : IMoveCommand
         {
-            return new Robot(ai, executor);
+            return new Robot<TCommand>(ai, executor);
         }
     }
 }
