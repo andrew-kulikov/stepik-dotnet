@@ -92,7 +92,7 @@ namespace Generics.Robots
         }
     }
 
-    public class Robot
+    public static  class Robot
     {
         public static Robot<TCommand> Create<TCommand>(IRobotAI<TCommand> ai, IDevice<TCommand> executor) where TCommand : IMoveCommand
         {
