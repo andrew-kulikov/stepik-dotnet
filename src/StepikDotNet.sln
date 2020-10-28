@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delegates.TreeTraversal", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delegates.PairsAnalysis", "Delegates.PairsAnalysis\Delegates.PairsAnalysis.csproj", "{56A1B9A9-8494-4E02-B466-FC5C8FA5CF07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflection.Randomness", "Reflection.Randomness\Reflection.Randomness.csproj", "{50951D62-9A5A-4997-8FCA-6EBF8B7D9610}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{56A1B9A9-8494-4E02-B466-FC5C8FA5CF07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56A1B9A9-8494-4E02-B466-FC5C8FA5CF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56A1B9A9-8494-4E02-B466-FC5C8FA5CF07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50951D62-9A5A-4997-8FCA-6EBF8B7D9610}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50951D62-9A5A-4997-8FCA-6EBF8B7D9610}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50951D62-9A5A-4997-8FCA-6EBF8B7D9610}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50951D62-9A5A-4997-8FCA-6EBF8B7D9610}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
