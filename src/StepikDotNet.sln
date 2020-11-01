@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reflection.Differentiation"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memory.API", "Memory.API.csproj\Memory.API.csproj", "{A4F81C19-D0B2-4689-B4A3-0E93AA3FFE09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memory.Timers", "Memory.Timers.csproj\Memory.Timers.csproj", "{AED81CE1-EA72-4BCB-B62D-74AF7B35A2BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,10 @@ Global
 		{A4F81C19-D0B2-4689-B4A3-0E93AA3FFE09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4F81C19-D0B2-4689-B4A3-0E93AA3FFE09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4F81C19-D0B2-4689-B4A3-0E93AA3FFE09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AED81CE1-EA72-4BCB-B62D-74AF7B35A2BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AED81CE1-EA72-4BCB-B62D-74AF7B35A2BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AED81CE1-EA72-4BCB-B62D-74AF7B35A2BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AED81CE1-EA72-4BCB-B62D-74AF7B35A2BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
